@@ -1,0 +1,111 @@
+<html>
+  <head>
+    <title>NJ Tax Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #button {
+        position: absolute;
+        z-index: 1;
+        padding: 8px;
+        width: 100px;
+        background-color: orange;
+        color: black;
+        left: 50px;
+        top: 200px;
+        text-align: center;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="button">Swap Colors</div>
+    <script>
+      var colorState = false;
+
+      var button = document.getElementById("button");
+      button.onclick = function() {
+        //Toggle box state 
+        colorState = !colorState;
+
+        //Iterate polygons and change colors
+        var max = polygons.length;
+        for(var i = 0; i < polygons.length; i++) {
+          if (colorState) {
+            //Handle Cities with no home sales
+            if (polygons[i].price == 0)
+            {
+              polygons[i].setOptions({fillColor: '#CC00CC' , strokeColor: '#CC00CC'});
+              continue;
+            }
+
+            //Get a number that indicates where we should be on the gradient
+            //0 hue = red, 0.33 hue = green
+            var hue = (0.333 - Math.min(polygons[i].price * 0.333 / 500000.0, 0.333));
+            var color = hsvToRgb(hue, 1.0, 0.75);
+            polygons[i].setOptions({fillColor: '#' + padHex(color[0]) + padHex(color[1]) + padHex(color[2]) , strokeColor: '#' + padHex(color[0]) + padHex(color[1]) + padHex(color[2])});
+          }
+          else {
+            //Handle Cities with no tax
+            if (polygons[i].tax == 0)
+            {
+              polygons[i].setOptions({fillColor: '#CC00CC' , strokeColor: '#CC00CC'});
+              continue;
+            }
+
+            //Get a number that indicates where we should be on the gradient
+            //0 hue = red, 0.33 hue = green
+            var hue = (0.333 - Math.min(polygons[i].tax * 0.333 / 15000.0, 0.333));
+            var color = hsvToRgb(hue, 1.0, 0.75);
+            polygons[i].setOptions({fillColor: '#' + padHex(color[0]) + padHex(color[1]) + padHex(color[2]) , strokeColor: '#' + padHex(color[0]) + padHex(color[1]) + padHex(color[2])});
+          }
+        }
+      };
+
+      function padHex(value) {
+        if (value > 15) {
+          return value.toString(16);
+        }
+        else {
+          return "0" + value.toString(16);
+        }
+      }
+
+      function hsvToRgb(h, s, v) {
+        var r, g, b;
+
+        var i = Math.floor(h * 6);
+        var f = h * 6 - i;
+        var p = v * (1 - s);
+        var q = v * (1 - f * s);
+        var t = v * (1 - (1 - f) * s);
+
+        switch (i % 6) {
+          case 0: r = v, g = t, b = p; break;
+          case 1: r = q, g = v, b = p; break;
+          case 2: r = p, g = v, b = t; break;
+          case 3: r = p, g = q, b = v; break;
+          case 4: r = t, g = p, b = v; break;
+          case 5: r = v, g = p, b = q; break;
+        }
+
+        return [ parseInt(r * 255) , parseInt(g * 255) , parseInt(b * 255) ];
+      }
+    </script>
+    <script src="Javascript.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBpJJ7MuzVqxRivZvxXgsvs1V5SrjBfeKU&callback=initMap" async defer></script>
+  </body>
+</html>
