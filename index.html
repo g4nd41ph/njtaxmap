@@ -19,11 +19,11 @@
         position: absolute;
         z-index: 1;
         padding: 8px;
-        width: 100px;
+        width: 200px;
         background-color: orange;
         color: black;
         left: 50px;
-        top: 200px;
+        top: 100px;
         text-align: center;
         border-radius: 5px;
         cursor: pointer;
@@ -32,14 +32,22 @@
   </head>
   <body>
     <div id="map"></div>
-    <div id="button">Swap Colors</div>
+    <div id="button">Sort by Mean Tax</div>
     <script>
-      var colorState = false;
+      var colorState = true;
 
       var button = document.getElementById("button");
       button.onclick = function() {
         //Toggle box state 
         colorState = !colorState;
+
+        //Change button text
+        if (colorState) {
+          button.innerHTML = "Sort by Mean Tax";
+        }
+        else {
+          button.innerHTML = "Sort by Mean Home Price";
+        }
 
         //Iterate polygons and change colors
         var max = polygons.length;
